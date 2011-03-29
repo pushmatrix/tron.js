@@ -5,6 +5,14 @@ var Grid = function(rows, cols, cellWidth, cellHeight) {
   this.cols = cols;
   this.cellWidth = cellWidth;
   this.cellHeight = cellHeight;
+  
+  // Make the map for collisions
+  this.map = [];
+  for (var i = 0; i <= rows + 1; i++) {
+    for (var j = 0; j <= cols + 1; j++) {
+      map = [0];
+    }
+  }
 
   this.vbo = gl.createBuffer();
 
@@ -39,6 +47,20 @@ var Grid = function(rows, cols, cellWidth, cellHeight) {
 
     for (var i = 0; i <= rows; i++) {
       gl.drawArrays(gl.LINES, cols * 6 + 2, i * (cols * 6 + 2));
+    }
+  }
+  
+  this.cellType = function(coord) {
+    if (coord.y > cols || coord.x > rows || coord.x < 0 || coord.y < 0) {
+      return -1;
+    }
+    var index = coord.y * cols + coord.x;
+    if (map[index]) {
+      return 1;
+    } 
+    else {
+      map[index] = 1;
+      return 0;
     }
   }
 }

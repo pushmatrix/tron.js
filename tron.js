@@ -160,7 +160,7 @@ function webGLStart() {
 
   grid = new Grid(10, 10, 1, 1);
   var startPos = {'x': 2, 'y': 0, 'z': 2};
-  bike = new Bike(startPos, 4, grid, 0);
+  bike = new Bike(startPos, 4, grid, {x: 1, y: 0.1, z: 1});
   
   (function animloop(){
     requestAnimFrame(animloop, gl);
