@@ -5,8 +5,8 @@ var gl;
 
 var oldX = 0;
 var oldY = 0;
-var rotationX = 10;
-var rotationY = 120;
+var rotationX = 0;//10;
+var rotationY = 0;//120;
 
 var deltaX = 0;
 var deltaY = 0;
@@ -225,9 +225,13 @@ function drawScene() {
   
   mat4.rotate(mvMatrix, rotationX, [0, 1, 0]); // Rotate 90 degrees around the Y axis
   
-  //mat4.translate(mvMatrix, [-5.0, 0, -5]);
+  mat4.translate(mvMatrix, [-5.0, 0, -5]);
 
-	gluLookAt(0,10,0,-5,0,5,0,1,0);
+	gluLookAt(player1.position.x - player1.direction.x * 5,4,
+	          player1.position.z - player1.direction.y * 5,
+	          player1.position.x + player1.direction.x, 1,
+	          player1.position.z + player1.direction.y,
+	          0, 1, 0 );
   setMatrixUniforms();
   
  // gl.useProgram(glowHorizProgram);
