@@ -9,8 +9,9 @@ var Bike = function(startPos, speed, grid, color) {
   this.nextDirection = { x: 0, y: 0 };
   this.turnTravel = 0;
   this.wall = new Wall(1, startPos);
+  // set a wall on the starting position
+  this.grid.setWall(this.cellPos);
   
-  console.log(this.cellPos);
 
   this.vbo = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
@@ -113,7 +114,17 @@ var Bike = function(startPos, speed, grid, color) {
     }
 
   }
-    
+  
+  this.turnLeft = function() {
+    this.nextDirection.x = this.direction.y;
+    this.nextDirection.y = -this.direction.x;
+  }
+  
+  this.turnRight = function() {
+    this.nextDirection.x = -this.direction.y;
+    this.nextDirection.y = this.direction.x;
+  }
+  
   this.render = function() {
     color3(this.color.x, this.color.y, this.color.z);
     this.wall.render();
@@ -128,6 +139,7 @@ var Bike = function(startPos, speed, grid, color) {
     setMatrixUniforms();
     gl.drawElements(gl.TRIANGLES, this.ibo.numItems, gl.UNSIGNED_SHORT, 0);
     mvPopMatrix();
+    setMatrixUniforms();
   }
   
 }

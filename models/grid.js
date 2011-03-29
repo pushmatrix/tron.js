@@ -63,4 +63,9 @@ var Grid = function(rows, cols, cellWidth, cellHeight) {
       return 0;
     }
   }
+  
+  this.setWall = function(coord) {
+    var index = coord.y * cols + coord.x;
+    map[index] = 1;
+  }
 }

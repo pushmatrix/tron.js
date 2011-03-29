@@ -1,5 +1,6 @@
 var grid;
-var bike;
+var player1;
+var player2;
 var gl;
 
 var oldX = 0;
@@ -127,6 +128,7 @@ var squareVertexPositionBuffer;
 
 
 function drawScene() {
+  mvPushMatrix();
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -143,7 +145,9 @@ function drawScene() {
   
   setMatrixUniforms();
   grid.render();
-  bike.render();
+  player1.render();
+  player2.render();
+  mvPopMatrix();
 }
 
 
@@ -160,7 +164,10 @@ function webGLStart() {
 
   grid = new Grid(10, 10, 1, 1);
   var startPos = {'x': 2, 'y': 0, 'z': 2};
-  bike = new Bike(startPos, 4, grid, {x: 1, y: 0.1, z: 1});
+  player1 = new Bike(startPos, 4, grid, {x: 1, y: 0.1, z: 1});
+  
+  startPos = {'x': 5, 'y': 0, 'z': 5};
+  player2 = new Bike(startPos, 4, grid, {x: 0.1, y: 1, z: 1});
   
   (function animloop(){
     requestAnimFrame(animloop, gl);
@@ -205,18 +212,17 @@ this.onmouseup = mouseUp;
 function update() {
   var timestep = (Date.now() - elapsed) * 0.001;
   elapsed = Date.now();
-  bike.update(timestep);
+  player1.update(timestep);
+  player2.update(timestep);
 }
 
 function keypress(event) {
-  var key = event.charCode;
-  if (key == 97) {
-    bike.nextDirection.x = bike.direction.y;
-    bike.nextDirection.y = -bike.direction.x;
-  }
-  else if (key == 115) {
-    bike.nextDirection.x = -bike.direction.y;
-    bike.nextDirection.y = bike.direction.x;
+  var key = String.fromCharCode(event.charCode);
+  switch (key) {
+    case "a": player1.turnLeft(); break;
+    case "s": player1.turnRight(); break;
+    case "k": player2.turnLeft(); break;
+    case "l": player2.turnRight(); break;
   }
 }
 this.onkeypress = keypress;
