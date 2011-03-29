@@ -220,13 +220,14 @@ function drawScene() {
 
   mat4.identity(mvMatrix);
 
-  mat4.translate(mvMatrix, [0, -2.0, -22.0]);
+  //mat4.translate(mvMatrix, [0, -2.0, -22.0]);
   mat4.rotate(mvMatrix, rotationY, [1, 0, 0]); // Rotate 90 degrees around the Y axis
   
   mat4.rotate(mvMatrix, rotationX, [0, 1, 0]); // Rotate 90 degrees around the Y axis
   
-  mat4.translate(mvMatrix, [-5.0, 0, -5]);
-  
+  //mat4.translate(mvMatrix, [-5.0, 0, -5]);
+
+	gluLookAt(0,10,0,-5,0,5,0,1,0);
   setMatrixUniforms();
   
  // gl.useProgram(glowHorizProgram);
