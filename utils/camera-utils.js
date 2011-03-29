@@ -12,10 +12,12 @@ var gluLookAt = function(eyex, eyey, eyez,
 		var m = mat4.create();
 
     vec3.normalize(forward);
-		vec3.normalize(up);
 		
     /* Side = forward x up */
     vec3.cross(forward, up, side);
+
+		vec3.normalize(side);
+		
 
     /* Recompute up as: up = side x forward */
     vec3.cross(side, forward, up);
