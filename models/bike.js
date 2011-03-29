@@ -71,7 +71,7 @@ var Bike = function(startPos, speed, grid, color) {
   
     var distance = this.speed * timestep;
     if (this.partial + distance >= grid.cellWidth) {
-      this.position.x += this.direction.y * (this.grid.cellWidth - this.partial);
+      this.position.x += this.direction.x * (this.grid.cellWidth - this.partial);
       this.position.z += this.direction.y * (this.grid.cellWidth - this.partial);
       
       distance -= this.grid.cellWidth - this.partial;
@@ -146,7 +146,7 @@ var Bike = function(startPos, speed, grid, color) {
   
   this.render = function() {
     mvPushMatrix();
-    gl.uniform4fv(shaderProgram.uColorUniform, new Float32Array([1,1,1,1]));
+    color3(1,1,1);
     mat4.translate(mvMatrix, [this.position.x, this.position.y, this.position.z]);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.vbo.itemSize, gl.FLOAT, false, 0, 0);

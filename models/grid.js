@@ -33,6 +33,7 @@ var Grid = function(rows, cols, cellWidth, cellHeight) {
   this.render = function() {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
     
+    color3(0,1,1);
     gl.uniform4fv(shaderProgram.uColorUniform, new Float32Array([0,1,1,1]));
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 

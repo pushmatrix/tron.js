@@ -108,6 +108,10 @@ function mvPopMatrix() {
   mvMatrix = mvMatrixStack.pop();
 }
 
+function color3(r, g, b) {
+  gl.uniform4fv(shaderProgram.uColorUniform, new Float32Array([r, g, b, 1]));
+}
+
 
 
 function setMatrixUniforms() {
