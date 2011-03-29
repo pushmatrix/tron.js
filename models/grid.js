@@ -68,4 +68,8 @@ var Grid = function(rows, cols, cellWidth, cellHeight) {
     var index = coord.y * cols + coord.x;
     map[index] = 1;
   }
+  
+  this.reset = function(coord) {
+    
+  }
 }
