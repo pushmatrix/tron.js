@@ -146,6 +146,7 @@ var Bike = function(startPos, speed, grid, color) {
   
   this.render = function() {
     mvPushMatrix();
+    gl.uniform4fv(shaderProgram.uColorUniform, new Float32Array([1,1,1,1]));
     mat4.translate(mvMatrix, [this.position.x, this.position.y, this.position.z]);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.vbo.itemSize, gl.FLOAT, false, 0, 0);
