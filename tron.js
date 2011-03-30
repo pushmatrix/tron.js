@@ -264,11 +264,9 @@ function drawScene() {
  // mat4.translate(mvMatrix, [-5.0, 0, -5]);
 
 
-          
-	gluLookAt(player1.position.x - player1.direction.x * 5,4,
-	          player1.position.z - player1.direction.y * 5,
-	          player1.position.x + player1.cameraDirection.x, 1,
-	          player1.position.z + player1.cameraDirection.z,
+  
+	gluLookAt(player1.camera.xPos, 4, player1.camera.zPos,
+	          player1.position.x, player1.position.y, player1.position.z,
 	          0, 1, 0 );
 	    
   setMatrixUniforms();

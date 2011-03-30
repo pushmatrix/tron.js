@@ -6,7 +6,10 @@ var Bike = function(startPos, speed, grid, color) {
   this.grid = grid;
   this.color = color;
   this.direction = { x: 1, y: 0 };
-	this.cameraDirection = {x: 1, z: 0};
+	this.camera = {xDir: 1,
+		 						 zDir: 0, 
+								 xPos: this.position.x - this.direction.x * 10, 
+								 zPos: this.position.z - this.direction.y * 10};
   this.nextDirection = { x: 0, y: 0 };
   this.nextAngle = 0;
   this.turnTravel = 0;
@@ -34,6 +37,7 @@ var Bike = function(startPos, speed, grid, color) {
   
   this.partial = 0;
   this.update = function(timestep) {
+		this.updateCamera();
 		
     var distance = this.speed * timestep;
     if (this.partial + distance >= grid.cellWidth) {
@@ -75,7 +79,6 @@ var Bike = function(startPos, speed, grid, color) {
     //if (this.turnTravel > 4) {
       this.wall.grow(this.position, false);
     //}
-		this.cam();
   }
   
   this.turnLeft = function() {
@@ -90,41 +93,9 @@ var Bike = function(startPos, speed, grid, color) {
     this.nextAngle = -Math.PI * 0.5;
   }
   
-	this.cam = function() {debugger
-		if((this.cameraDirection.x != this.direction.x)||
-				(this.cameraDirection.z != this.direction.y)){
-			/*
-			start   1, 0  =  1, 0
-			turnL   0,-1 !=  1, 0
-			!=							 1*.1...0, 0+(.1*-1)...-1
-			*/
-		  /*change camera direction
-		  if((this.cameraDirection.x != this.direction.x)||
-		 		 (this.cameraDirection.z != this.direction.y)) {
-				if(this.direction.x == 0) {
-					this.cameraDiretion.x = -4;
-				} else {
-					this.cameraDirection.x += this.direction.x * 0.1;
-				}
-				if(this.direction.y == 0) {
-					this.cameraDirection.z *= 0.1;
-				} else {
-					this.cameraDirection.z += this.direction.y * 0.1;
-				}
-		  } else {
-		  	this.cameraDirection.x = this.direction.x;
-		  	this.cameraDirection.z = this.direction.y;
-		  }*///
-		 		
-			// change camera direction
-			if(((this.cameraDirection.x - this.direction.x) > 0.2)||()) {
-				this.cameraDirection.x = (this.direction.x + (this.cameraDirection.x / 2));
-			  this.cameraDirection.z = (this.direction.y + (this.cameraDirection.z / 2));
-			} else {
-				this.cameraDirection.x = this.direction.x;
-				this.cameraDirection.z = this.direction.y;
-			}///
-		}
+	this.updateCamera = function() {
+		this.camera.xPos += (this.position.x - this.camera.xPos - this.direction.x * 7) / 2;
+		this.camera.zPos += (this.position.z - this.camera.zPos - this.direction.y * 7) / 2;
 	}
 
   this.render = function() {
