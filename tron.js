@@ -5,7 +5,7 @@ var gl;
 
 var oldX = 0;
 var oldY = 0;
-var rotationX = 10;
+var rotationX = 8.7;
 var rotationY = 120;
 
 var deltaX = 0;
@@ -256,22 +256,22 @@ function drawScene() {
 
   mat4.identity(mvMatrix);
 
- // mat4.translate(mvMatrix, [0, -2.0, -22.0]);
-  //mat4.rotate(mvMatrix, rotationY, [1, 0, 0]); // Rotate 90 degrees around the Y axis
+  mat4.translate(mvMatrix, [0, -2.0, -22.0]);
+  mat4.rotate(mvMatrix, rotationY, [1, 0, 0]); // Rotate 90 degrees around the Y axis
   
- // mat4.rotate(mvMatrix, rotationX, [0, 1, 0]); // Rotate 90 degrees around the Y axis
+  mat4.rotate(mvMatrix, rotationX, [0, 1, 0]); // Rotate 90 degrees around the Y axis
   
-  //mat4.translate(mvMatrix, [-5.0, 0, -5]);
+  mat4.translate(mvMatrix, [-5.0, 0, -5]);
 
+
+          
 	gluLookAt(player1.position.x - player1.direction.x * 5,4,
 	          player1.position.z - player1.direction.y * 5,
 	          player1.position.x + player1.cameraDirection.x, 1,
 	          player1.position.z + player1.cameraDirection.z,
-	          0, 1, 0 );
-		          
-  //  gluLookAt(10,0,10,0,0,0,0,1,0);
- // debugger;
 
+	          0, 1, 0 );       
+	        //  gluLookAt(10,0,10,0,0,0,0,1,0); */
   setMatrixUniforms();
   
  // gl.useProgram(shaderProgr);
@@ -279,6 +279,7 @@ function drawScene() {
   player1.render();
   player2.render();
   
+  /*
   
   gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
   
@@ -298,7 +299,7 @@ function drawScene() {
           gl.vertexAttribPointer(currentProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
   
   gl.drawArrays(gl.TRIANGLES, 0, 4);
-  
+  */
   mvPopMatrix();
 }
 

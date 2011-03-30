@@ -38,7 +38,7 @@ var gluLookAt = function(eyex, eyey, eyez,
 		m[10] = -forward[2];
 
     var tmp = mat4.create();
-    //debugger;
+
 		mat4.multiply(mvMatrix, m, mvMatrix);
 		mat4.translate(mvMatrix, [-eyex, -eyey, -eyez]);
 }
