@@ -11,7 +11,9 @@
   
   <script type="text/javascript" src="models/grid.js"></script>
   <script type="text/javascript" src="models/bike.js"></script>
+  <script type="text/javascript" src="models/wall.js"></script>
   <script type="text/javascript" src="tron.js"></script>
+  
  
   <script id="shader-fs" type="x-shader/x-fragment"> 
   #ifdef GL_ES
@@ -22,11 +24,13 @@
   
   uniform sampler2D uSampler;
   uniform vec4 uVertexColor;
+  uniform bool enableTextures;
 
   void main(void) {
-    gl_FragColor = uVertexColor;   // vec4(1,1,1,1); //vec4(texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t)));
+    gl_FragColor = uVertexColor; 
   }
   </script> 
+  
 
   <script id="shader-vs" type="x-shader/x-vertex"> 
   attribute vec3 aVertexPosition;
@@ -45,12 +49,127 @@
     //vTextureCoord = aTextureCoord;
   }
   </script> 
+  
+  
+  <script id="shader-fs2" type="x-shader/x-fragment"> 
+  #ifdef GL_ES
+  precision highp float;
+  #endif
+  
+  varying vec2 vTextureCoord;
+  
+  uniform sampler2D uSampler;
+  uniform vec4 uVertexColor;
+  uniform bool enableTextures;
+
+  void main(void) {
+    gl_FragColor = vec4(1,0.5,0.5,1); 
+  }
+  </script> 
+  
+
+  <script id="shader-vs2" type="x-shader/x-vertex"> 
+  attribute vec3 aVertexPosition;
+  attribute vec2 aTextureCoord;
+  attribute vec4 aVertexColor;
+
+  uniform mat4 uMVMatrix;
+  uniform mat4 uPMatrix;
+  uniform vec3 uVertexColor;
+  
+  varying vec4 vColor;
+  varying vec2 vTextureCoord;
+
+  void main(void) {
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+    //vTextureCoord = aTextureCoord;
+  }
+  </script>
+  
+  
+  
+  
+  <script id="texture-shader-fs" type="x-shader/x-fragment"> 
+  #ifdef GL_ES
+  precision highp float;
+  #endif
+  
+  varying vec2 vTextureCoord;
+  
+  uniform sampler2D uSampler;
+
+  void main(void) {
+     vec4(texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t))); 
+  }
+  </script>
+  
+  <script id="horiz-glow-fs" type="x-shader/x-fragment">
+  #ifdef GL_ES
+    precision highp float;
+  #endif
+  
+  uniform sampler2D glowMap; // the texture with the scene you want to blur
+  varying vec2 vTexCoord;
+
+  const float blurSize = 1.0/200.0; // I've chosen this size because this will result in that every step will be one pixel wide if the glowMap texture is of size 512x512
+
+  void main(void)
+  {
+  
+     vec4 sum = vec4(0.0);
+
+     // blur in X (vertical)
+     // take nine samples, with the distance blurSize between them
+     sum += texture2D(glowMap, vec2(vTexCoord.x - 4.0*blurSize, vTexCoord.y)) * 0.05;
+     sum += texture2D(glowMap, vec2(vTexCoord.x - 3.0*blurSize, vTexCoord.y)) * 0.09;
+     sum += texture2D(glowMap, vec2(vTexCoord.x - 2.0*blurSize, vTexCoord.y)) * 0.12;
+     sum += texture2D(glowMap, vec2(vTexCoord.x - blurSize, vTexCoord.y)) * 0.15;
+     sum += texture2D(glowMap, vec2(vTexCoord.x, vTexCoord.y)) * 0.16;
+     sum += texture2D(glowMap, vec2(vTexCoord.x + blurSize, vTexCoord.y)) * 0.15;
+     sum += texture2D(glowMap, vec2(vTexCoord.x + 2.0*blurSize, vTexCoord.y)) * 0.12;
+     sum += texture2D(glowMap, vec2(vTexCoord.x + 3.0*blurSize, vTexCoord.y)) * 0.09;
+     sum += texture2D(glowMap, vec2(vTexCoord.x + 4.0*blurSize, vTexCoord.y)) * 0.05;
+
+     gl_FragColor = sum;
+  }
+  </script>
+
+  <script id="vert-glow-fs" type="x-shader/x-fragment">
+  #ifdef GL_ES
+    precision highp float;
+  #endif
+  
+  uniform sampler2D glowMap; // this should hold the texture rendered by the horizontal blur pass
+  varying vec2 vTexCoord;
+
+  const float blurSize = 1.0/200.0;
+
+  void main(void)
+  {
+     vec4 sum = vec4(0.0);
+
+     // blur in y (vertical)
+     // take nine samples, with the distance blurSize between them
+     sum += texture2D(glowMap, vec2(vTexCoord.x, vTexCoord.y - 4.0*blurSize)) * 0.05;
+     sum += texture2D(glowMap, vec2(vTexCoord.x, vTexCoord.y - 3.0*blurSize)) * 0.09;
+     sum += texture2D(glowMap, vec2(vTexCoord.x, vTexCoord.y - 2.0*blurSize)) * 0.12;
+     sum += texture2D(glowMap, vec2(vTexCoord.x, vTexCoord.y - blurSize)) * 0.15;
+     sum += texture2D(glowMap, vec2(vTexCoord.x, vTexCoord.y)) * 0.16;
+     sum += texture2D(glowMap, vec2(vTexCoord.x, vTexCoord.y + blurSize)) * 0.15;
+     sum += texture2D(glowMap, vec2(vTexCoord.x, vTexCoord.y + 2.0*blurSize)) * 0.12;
+     sum += texture2D(glowMap, vec2(vTexCoord.x, vTexCoord.y + 3.0*blurSize)) * 0.09;
+     sum += texture2D(glowMap, vec2(vTexCoord.x, vTexCoord.y + 4.0*blurSize)) * 0.05;
+
+     gl_FragColor = sum;
+  }
+  </script>
+
 
   </head> 
 
 
   <body onload="webGLStart();" style="background: black;"> 
-    <center><canvas id="canvas" style="border: none" width="500" height="500"></canvas></center>
+    <center><canvas id="canvas" style="border: none" width="650" height="650"></canvas></center>
   </body> 
 
   </html>
