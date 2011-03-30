@@ -153,7 +153,7 @@ var Bike = function(startPos, speed, grid, color) {
 		  }*///
 		 		
 			// change camera direction
-			if(this.cameraDirection.x > 0.2) {
+			if(((this.cameraDirection.x - this.direction.x) > 0.2)||()) {
 				this.cameraDirection.x = (this.direction.x + (this.cameraDirection.x / 2));
 			  this.cameraDirection.z = (this.direction.y + (this.cameraDirection.z / 2));
 			} else {
