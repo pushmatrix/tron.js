@@ -2,9 +2,6 @@ var gluLookAt = function(eyex, eyey, eyez,
 												 centerx, centery, centerz, 
 												 upx, upy, upz) {
 		
-		console.log(eyex, eyey, eyez, 
-                           												 centerx, centery, centerz, 
-                           												 upx, upy, upz)
 		var forward = vec3.create([centerx - eyex,
 								 							 centery - eyey,
 								 							 centerz - eyez]);
@@ -41,7 +38,6 @@ var gluLookAt = function(eyex, eyey, eyez,
 		m[10] = -forward[2];
 
     var tmp = mat4.create();
-    debugger;
 		mat4.multiply(mvMatrix, m, mvMatrix);
 		mat4.translate(mvMatrix, [-eyex, -eyey, -eyez]);
 }
