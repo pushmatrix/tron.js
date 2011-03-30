@@ -7,8 +7,8 @@ var gluLookAt = function(eyex, eyey, eyez,
 								 							 centerz - eyez]);
 		
 		var up = vec3.create([upx, upy, upz]);
-		var side = vec3.create();
 		
+		var side = vec3.create();
 		var m = mat4.create();
 
     vec3.normalize(forward);
@@ -38,6 +38,7 @@ var gluLookAt = function(eyex, eyey, eyez,
 		m[10] = -forward[2];
 
     var tmp = mat4.create();
+
 		mat4.multiply(mvMatrix, m, mvMatrix);
 		mat4.translate(mvMatrix, [-eyex, -eyey, -eyez]);
 }
