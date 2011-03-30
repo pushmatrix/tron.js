@@ -264,13 +264,13 @@ function drawScene() {
   mat4.translate(mvMatrix, [-5.0, 0, -5]);
 
 
-	   /*       
+/*	          
 	gluLookAt(player1.position.x - player1.direction.x * 5,4,
 	          player1.position.z - player1.direction.y * 5,
 	          player1.position.x + player1.direction.x, 1,
 	          player1.position.z + player1.direction.y,
-	          0, 1, 0 );  */      
-	        //  gluLookAt(10,0,10,0,0,0,0,1,0);
+	          0, 1, 0 );       
+	        //  gluLookAt(10,0,10,0,0,0,0,1,0); */
   setMatrixUniforms();
   
  // gl.useProgram(shaderProgr);

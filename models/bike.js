@@ -7,6 +7,7 @@ var Bike = function(startPos, speed, grid, color) {
   this.color = color;
   this.direction = { x: 1, y: 0 };
   this.nextDirection = { x: 0, y: 0 };
+  this.nextAngle = 0;
   this.turnTravel = 0;
   this.angle = -Math.PI * 0.5;
   this.wall = new Wall(1, startPos);
@@ -45,6 +46,8 @@ var Bike = function(startPos, speed, grid, color) {
       if (this.nextDirection.x != 0 || this.nextDirection.y != 0) {
         this.direction.x = this.nextDirection.x;
         this.direction.y = this.nextDirection.y;
+        this.angle += this.nextAngle;
+        this.nextAngle = 0;
         this.nextDirection.x = 0;
         this.nextDirection.y = 0;
         this.turnTravel = 0;
@@ -77,13 +80,13 @@ var Bike = function(startPos, speed, grid, color) {
   this.turnLeft = function() {
     this.nextDirection.x = this.direction.y;
     this.nextDirection.y = -this.direction.x;
-    this.angle += Math.PI * 0.5;
+    this.nextAngle = -Math.PI * 0.5;
   }
   
   this.turnRight = function() {
     this.nextDirection.x = -this.direction.y;
     this.nextDirection.y = this.direction.x;
-    this.angle -= Math.PI * 0.5;
+    this.nextAngle = -Math.PI * 0.5;
   }
   
   this.render = function() {
