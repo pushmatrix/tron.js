@@ -13,6 +13,7 @@
   <script type="text/javascript" src="models/bike.js"></script>
   <script type="text/javascript" src="models/wall.js"></script>
   <script type="text/javascript" src="tron.js"></script>
+  
  
   <script id="shader-fs" type="x-shader/x-fragment"> 
   #ifdef GL_ES
@@ -30,20 +31,6 @@
   }
   </script> 
   
-  <script id="texture-shader-fs" type="x-shader/x-fragment"> 
-  #ifdef GL_ES
-  precision highp float;
-  #endif
-  
-  varying vec2 vTextureCoord;
-  
-  uniform sampler2D uSampler;
-  uniform vec4 uVertexColor;
-
-  void main(void) {
-     gl_FragColor = vec4(1,1,1,1);//vec4(texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t))); 
-  }
-  </script>
 
   <script id="shader-vs" type="x-shader/x-vertex"> 
   attribute vec3 aVertexPosition;
@@ -62,6 +49,59 @@
     //vTextureCoord = aTextureCoord;
   }
   </script> 
+  
+  
+  <script id="shader-fs2" type="x-shader/x-fragment"> 
+  #ifdef GL_ES
+  precision highp float;
+  #endif
+  
+  varying vec2 vTextureCoord;
+  
+  uniform sampler2D uSampler;
+  uniform vec4 uVertexColor;
+  uniform bool enableTextures;
+
+  void main(void) {
+    gl_FragColor = vec4(1,0.5,0.5,1); 
+  }
+  </script> 
+  
+
+  <script id="shader-vs2" type="x-shader/x-vertex"> 
+  attribute vec3 aVertexPosition;
+  attribute vec2 aTextureCoord;
+  attribute vec4 aVertexColor;
+
+  uniform mat4 uMVMatrix;
+  uniform mat4 uPMatrix;
+  uniform vec3 uVertexColor;
+  
+  varying vec4 vColor;
+  varying vec2 vTextureCoord;
+
+  void main(void) {
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+    //vTextureCoord = aTextureCoord;
+  }
+  </script>
+  
+  
+  
+  
+  <script id="texture-shader-fs" type="x-shader/x-fragment"> 
+  #ifdef GL_ES
+  precision highp float;
+  #endif
+  
+  varying vec2 vTextureCoord;
+  
+  uniform sampler2D uSampler;
+
+  void main(void) {
+     vec4(texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t))); 
+  }
+  </script>
   
   <script id="horiz-glow-fs" type="x-shader/x-fragment">
   #ifdef GL_ES
@@ -129,7 +169,7 @@
 
 
   <body onload="webGLStart();" style="background: black;"> 
-    <center><canvas id="canvas" style="border: none" width="500" height="500"></canvas></center>
+    <center><canvas id="canvas" style="border: none" width="650" height="650"></canvas></center>
   </body> 
 
   </html>

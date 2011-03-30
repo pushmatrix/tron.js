@@ -5,13 +5,16 @@ var gl;
 
 var oldX = 0;
 var oldY = 0;
-var rotationX = 0;//10;
-var rotationY = 0;//120;
+var rotationX = 10;
+var rotationY = 120;
 
 var deltaX = 0;
 var deltaY = 0;
 var dragging = false;
 var elapsed = Date.now();
+
+var speed = 8;
+var currentProgram;
    function initGL(canvas) {
        try {
            gl = canvas.getContext("experimental-webgl");
@@ -28,6 +31,7 @@ var elapsed = Date.now();
    function getShader(gl, id) {
        var shaderScript = document.getElementById(id);
        if (!shaderScript) {
+            console.log("shader not found!");
            return null;
        }
 
@@ -46,6 +50,7 @@ var elapsed = Date.now();
        } else if (shaderScript.type == "x-shader/x-vertex") {
            shader = gl.createShader(gl.VERTEX_SHADER);
        } else {
+         console.log("couldn't determine whether fragment or vertex shader.")
            return null;
        }
 
@@ -62,6 +67,7 @@ var elapsed = Date.now();
 
 
    var shaderProgram;
+   var shaderProgram2;
    var textureShaderProgram;
    var glowHorizProgram;
    var glowVertProgram;
@@ -81,6 +87,11 @@ var elapsed = Date.now();
      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(basicSquare.vertices), gl.STATIC_DRAW);
      basicSquare.vbo.itemSize = 3;
      basicSquare.vbo.numItems = 4;
+     
+     basicSquare.texCoords = [1, 1, 0, 1, 1, 0, 0, 0];
+     basicSquare.textureIBO = gl.createBuffer();
+     gl.bindBuffer(gl.ARRAY_BUFFER, basicSquare.textureIBO);
+     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(basicSquare.texCoords), gl.STATIC_DRAW);
      
      
      rttFramebuffer = gl.createFramebuffer();
@@ -110,8 +121,12 @@ var elapsed = Date.now();
    
    function initShaders() {
        var fragmentShader = getShader(gl, "shader-fs");
-       var textureFragmentShader = getShader(gl, "texture-shader-fs");
        var vertexShader = getShader(gl, "shader-vs");
+       
+       var fragmentShader2 = getShader(gl, "texture-shader-fs");
+       var vertexShader2 = getShader(gl, "shader-vs2");
+       
+       var textureFragmentShader = getShader(gl, "texture-shader-fs");
       
        var glowHorizShader = getShader(gl, "horiz-glow-fs");
        var glowVertShader = getShader(gl, "vert-glow-fs");
@@ -121,7 +136,7 @@ var elapsed = Date.now();
        gl.attachShader(glowHorizProgram, vertexShader);
        gl.attachShader(glowHorizProgram, glowHorizShader);
        
-       glowVertrogram = gl.createProgram();
+       glowVertProgram = gl.createProgram();
        gl.attachShader(glowVertProgram, vertexShader);
        gl.attachShader(glowVertProgram, glowVertShader);
         
@@ -129,6 +144,11 @@ var elapsed = Date.now();
        gl.attachShader(shaderProgram, vertexShader);
        gl.attachShader(shaderProgram, fragmentShader);
        gl.linkProgram(shaderProgram);
+       
+       shaderProgram2 = gl.createProgram();
+        gl.attachShader(shaderProgram2, vertexShader2);
+        gl.attachShader(shaderProgram2, fragmentShader2);
+        gl.linkProgram(shaderProgram2);
        
        textureShaderProgram = gl.createProgram();
         gl.attachShader(textureShaderProgram, vertexShader);
@@ -152,6 +172,23 @@ var elapsed = Date.now();
        shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
        shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
        
+       
+       shaderProgram2.vertexPositionAttribute = gl.getAttribLocation(shaderProgram2, "aVertexPosition");
+        gl.enableVertexAttribArray(shaderProgram2.vertexPositionAttribute);
+
+        shaderProgram2.textureCoordAttribute = gl.getAttribLocation(shaderProgram2, "aTextureCoord");
+        gl.enableVertexAttribArray(shaderProgram2.textureCoordAttribute);
+
+        shaderProgram2.uColorUniform = gl.getUniformLocation(shaderProgram2, "uVertexColor");
+        shaderProgram2.pMatrixUniform = gl.getUniformLocation(shaderProgram2, "uPMatrix");
+        shaderProgram2.mvMatrixUniform = gl.getUniformLocation(shaderProgram2, "uMVMatrix");
+        shaderProgram2.samplerUniform = gl.getUniformLocation(shaderProgram2, "uSampler");
+       
+       
+      // gl.useProgram(shaderProgram);
+       
+       
+       /*
        gl.useProgram(glowHorizProgram);
        
        
@@ -164,7 +201,7 @@ var elapsed = Date.now();
        textureShaderProgram.pMatrixUniform = gl.getUniformLocation(textureShaderProgram, "uPMatrix");
        textureShaderProgram.mvMatrixUniform = gl.getUniformLocation(textureShaderProgram, "uMVMatrix");
        textureShaderProgram.samplerUniform = gl.getUniformLocation(textureShaderProgram, "uSampler");
-
+*/
    }
 
 
@@ -186,22 +223,20 @@ function mvPopMatrix() {
   mvMatrix = mvMatrixStack.pop();
 }
 
+function changeShaderProgram(program) {
+  currentProgram = program;
+  gl.useProgram(program);
+  setMatrixUniforms();
+}
+
 function color3(r, g, b) {
-  gl.uniform4fv(shaderProgram.uColorUniform, new Float32Array([r, g, b, 1]));
-}
-
-function enableTextures() {
-  gl.uniform1i(shaderProgram.enableTextures, 1);
-}
-
-function disableTextures() {
-  gl.uniform1i(shaderProgram.enableTextures, 0);
+  gl.uniform4fv(currentProgram.uColorUniform, new Float32Array([r, g, b, 1]));
 }
 
 
 function setMatrixUniforms() {
-  gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
-  gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+  gl.uniformMatrix4fv(currentProgram.pMatrixUniform, false, pMatrix);
+  gl.uniformMatrix4fv(currentProgram.mvMatrixUniform, false, mvMatrix);
 }
 
 
@@ -213,39 +248,56 @@ var squareVertexPositionBuffer;
 
 function drawScene() {
   mvPushMatrix();
+ // changeShaderProgram(shaderProgram2);
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+  mat4.perspective(60, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
 
   mat4.identity(mvMatrix);
 
-  //mat4.translate(mvMatrix, [0, -2.0, -22.0]);
-  mat4.rotate(mvMatrix, rotationY, [1, 0, 0]); // Rotate 90 degrees around the Y axis
+ // mat4.translate(mvMatrix, [0, -2.0, -22.0]);
+  //mat4.rotate(mvMatrix, rotationY, [1, 0, 0]); // Rotate 90 degrees around the Y axis
   
-  mat4.rotate(mvMatrix, rotationX, [0, 1, 0]); // Rotate 90 degrees around the Y axis
+ // mat4.rotate(mvMatrix, rotationX, [0, 1, 0]); // Rotate 90 degrees around the Y axis
   
-  mat4.translate(mvMatrix, [-5.0, 0, -5]);
+  //mat4.translate(mvMatrix, [-5.0, 0, -5]);
 
 	gluLookAt(player1.position.x - player1.direction.x * 5,4,
 	          player1.position.z - player1.direction.y * 5,
 	          player1.position.x + player1.direction.x, 1,
 	          player1.position.z + player1.direction.y,
 	          0, 1, 0 );
+	          
+	          
+	        //  gluLookAt(10,0,10,0,0,0,0,1,0);
+	          debugger;
   setMatrixUniforms();
   
- // gl.useProgram(glowHorizProgram);
+ // gl.useProgram(shaderProgr);
   grid.render();
   player1.render();
   player2.render();
   
+  
   gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
+  
   grid.render();
   player1.render();
   player2.render();
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, rttTexture);
+  gl.uniform1i(shaderProgram2.samplerUniform, 0);
   
+  gl.bindBuffer(gl.ARRAY_BUFFER, basicSquare.vbo);
+          gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+          gl.bindBuffer(gl.ARRAY_BUFFER, basicSquare.textureVBO);
+          gl.vertexAttribPointer(currentProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+  
+  gl.drawArrays(gl.TRIANGLES, 0, 4);
   
   mvPopMatrix();
 }
@@ -256,6 +308,8 @@ function webGLStart() {
   gl = WebGLUtils.setupWebGL(canvas);
   initTextureFrameBuffer();
   initShaders();
+  
+  changeShaderProgram(shaderProgram);
    
 
   gl.viewportWidth = canvas.width;
@@ -264,12 +318,12 @@ function webGLStart() {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
 
-  grid = new Grid(10, 10, 1, 1);
+  grid = new Grid(20, 20, 1, 1);
   var startPos = {'x': 2, 'y': 0, 'z': 2};
-  player1 = new Bike(startPos, 4, grid, {x: 1, y: 0.1, z: 1});
+  player1 = new Bike(startPos, speed, grid, {x: 1, y: 0.1, z: 1});
   
   startPos = {'x': 5, 'y': 0, 'z': 5};
-  player2 = new Bike(startPos, 4, grid, {x: 0.1, y: 1, z: 1});
+  player2 = new Bike(startPos, speed, grid, {x: 0.1, y: 1, z: 1});
   
   (function animloop(){
     requestAnimFrame(animloop, gl);
@@ -330,12 +384,12 @@ function keypress(event) {
 }
 
 function resetGame() {
-  grid = new Grid(10, 10, 1, 1);
+  grid = new Grid(20, 20, 1, 1);
   var startPos = {'x': 2, 'y': 0, 'z': 2};
-  player1 = new Bike(startPos, 4, grid, {x: 1, y: 0.1, z: 1});
+  player1 = new Bike(startPos, speed, grid, {x: 1, y: 0.1, z: 1});
   
   startPos = {'x': 5, 'y': 0, 'z': 5};
-  player2 = new Bike(startPos, 4, grid, {x: 0.1, y: 1, z: 1});
+  player2 = new Bike(startPos, speed, grid, {x: 0.1, y: 1, z: 1});
 }
 this.onkeypress = keypress;
 

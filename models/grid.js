@@ -42,8 +42,8 @@ var Grid = function(rows, cols, cellWidth, cellHeight) {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
     
     color3(0,1,1);
-    gl.uniform4fv(shaderProgram.uColorUniform, new Float32Array([0,1,1,1]));
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+    gl.uniform4fv(currentProgram.uColorUniform, new Float32Array([0,1,1,1]));
+    gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 
     for (var i = 0; i <= rows; i++) {
       gl.drawArrays(gl.LINES, cols * 6 + 2, i * (cols * 6 + 2));

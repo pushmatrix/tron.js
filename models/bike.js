@@ -131,10 +131,10 @@ var Bike = function(startPos, speed, grid, color) {
     mvPushMatrix();
     mat4.translate(mvMatrix, [this.position.x, this.position.y, this.position.z]);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.vbo.itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, this.vbo.itemSize, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.ibo);
-    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.ibo.itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(currentProgram.textureCoordAttribute, this.ibo.itemSize, gl.FLOAT, false, 0, 0);
     
     setMatrixUniforms();
     gl.drawElements(gl.TRIANGLES, this.ibo.numItems, gl.UNSIGNED_SHORT, 0);

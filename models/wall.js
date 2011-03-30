@@ -33,7 +33,7 @@ var Wall = function(height, startPos) {
   }
   this.render = function() {
      gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
-     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+     gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
      gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vbo.itemSize);
   }
 }
