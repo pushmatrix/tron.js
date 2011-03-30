@@ -6,12 +6,13 @@ var Bike = function(startPos, speed, grid, color) {
   this.grid = grid;
   this.color = color;
   this.direction = { x: 1, y: 0 };
+	this.cameraDirection = {x: 1, z: 0};
   this.nextDirection = { x: 0, y: 0 };
   this.turnTravel = 0;
   this.wall = new Wall(1, startPos);
   // set a wall on the starting position
   this.grid.setWall(this.cellPos);
-  
+
 
   this.vbo = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
@@ -73,7 +74,7 @@ var Bike = function(startPos, speed, grid, color) {
   
   this.partial = 0;
   this.update = function(timestep) {
-  
+		
     var distance = this.speed * timestep;
     if (this.partial + distance >= grid.cellWidth) {
       this.position.x += this.direction.x * (this.grid.cellWidth - this.partial);
@@ -112,7 +113,7 @@ var Bike = function(startPos, speed, grid, color) {
     if (this.turnTravel > 0.1) {
       this.wall.grow(this.position, false);
     }
-
+		this.cam();
   }
   
   this.turnLeft = function() {
@@ -125,6 +126,43 @@ var Bike = function(startPos, speed, grid, color) {
     this.nextDirection.y = this.direction.x;
   }
   
+	this.cam = function() {debugger
+		if((this.cameraDirection.x != this.direction.x)||
+				(this.cameraDirection.z != this.direction.y)){
+			/*
+			start   1, 0  =  1, 0
+			turnL   0,-1 !=  1, 0
+			!=							 1*.1...0, 0+(.1*-1)...-1
+			*/
+		  /*change camera direction
+		  if((this.cameraDirection.x != this.direction.x)||
+		 		 (this.cameraDirection.z != this.direction.y)) {
+				if(this.direction.x == 0) {
+					this.cameraDiretion.x = -4;
+				} else {
+					this.cameraDirection.x += this.direction.x * 0.1;
+				}
+				if(this.direction.y == 0) {
+					this.cameraDirection.z *= 0.1;
+				} else {
+					this.cameraDirection.z += this.direction.y * 0.1;
+				}
+		  } else {
+		  	this.cameraDirection.x = this.direction.x;
+		  	this.cameraDirection.z = this.direction.y;
+		  }*///
+		 		
+			// change camera direction
+			if(this.cameraDirection.x > 0.2) {
+				this.cameraDirection.x = (this.direction.x + (this.cameraDirection.x / 2));
+			  this.cameraDirection.z = (this.direction.y + (this.cameraDirection.z / 2));
+			} else {
+				this.cameraDirection.x = this.direction.x;
+				this.cameraDirection.z = this.direction.y;
+			}///
+		}
+	}
+
   this.render = function() {
     color3(this.color.x, this.color.y, this.color.z);
     this.wall.render();

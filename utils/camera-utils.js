@@ -2,9 +2,6 @@ var gluLookAt = function(eyex, eyey, eyez,
 												 centerx, centery, centerz, 
 												 upx, upy, upz) {
 		
-		console.log(eyex, eyey, eyez, 
-                           												 centerx, centery, centerz, 
-                           												 upx, upy, upz)
 		var forward = vec3.create([centerx - eyex,
 								 							 centery - eyey,
 								 							 centerz - eyez]);

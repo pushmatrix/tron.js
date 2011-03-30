@@ -265,13 +265,12 @@ function drawScene() {
 
 	gluLookAt(player1.position.x - player1.direction.x * 5,4,
 	          player1.position.z - player1.direction.y * 5,
-	          player1.position.x + player1.direction.x, 1,
-	          player1.position.z + player1.direction.y,
+	          player1.position.x + player1.cameraDirection.x, 1,
+	          player1.position.z + player1.cameraDirection.z,
 	          0, 1, 0 );
-	          
-	          
+		          
   //  gluLookAt(10,0,10,0,0,0,0,1,0);
-  debugger;
+ // debugger;
 
   setMatrixUniforms();
   
@@ -322,7 +321,6 @@ function webGLStart() {
   grid = new Grid(20, 20, 1, 1);
   var startPos = {'x': 2, 'y': 0, 'z': 2};
   player1 = new Bike(startPos, speed, grid, {x: 1, y: 0.1, z: 1});
-  
   startPos = {'x': 5, 'y': 0, 'z': 5};
   player2 = new Bike(startPos, speed, grid, {x: 0.1, y: 1, z: 1});
   
