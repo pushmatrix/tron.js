@@ -15,9 +15,11 @@ var Wall = function(height, startPos) {
   this.grow = function(position, corner) {
     if (!corner) {
       this.vertices[this.vertices.length - 6] = position.x;
+      this.vertices[this.vertices.length - 5] = position.y + 1;
       this.vertices[this.vertices.length - 4] = position.z;
       
       this.vertices[this.vertices.length - 3] = position.x;
+      this.vertices[this.vertices.length - 2] = position.y;
       this.vertices[this.vertices.length - 1] = position.z;  
     } else {
       this.vertices = this.vertices.concat([position.x, position.y + 1, position.z]);

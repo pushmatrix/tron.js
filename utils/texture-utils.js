@@ -20,4 +20,4 @@ TextureUtils = function() {
   return { 
     createTexture: createTexture 
   }
-};
+}();

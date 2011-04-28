@@ -15,6 +15,7 @@ var elapsed = Date.now();
 
 var speed = 8;
 var currentProgram;
+var crateGif;
    function initGL(canvas) {
        try {
            gl = canvas.getContext("experimental-webgl");
@@ -78,17 +79,17 @@ var currentProgram;
    var basicSquare = {};
    function initTextureFrameBuffer() {
      
-     basicSquare.vertices = [-1, -1, 0,
-                              1, -1, 0,
+     basicSquare.vertices = [-1, 1, 0,
+                              -1, -1, 0,
                               1, 1, 0,
-                              -1, 1, 0];
+                              1, -1, 0];
      basicSquare.vbo = gl.createBuffer();
-     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+     gl.bindBuffer(gl.ARRAY_BUFFER, basicSquare.vbo);
      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(basicSquare.vertices), gl.STATIC_DRAW);
      basicSquare.vbo.itemSize = 3;
      basicSquare.vbo.numItems = 4;
      
-     basicSquare.texCoords = [1, 1, 0, 1, 1, 0, 0, 0];
+     basicSquare.texCoords = [0, 1, 0, 0, 1, 1, 1, 0];
      basicSquare.textureIBO = gl.createBuffer();
      gl.bindBuffer(gl.ARRAY_BUFFER, basicSquare.textureIBO);
      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(basicSquare.texCoords), gl.STATIC_DRAW);
@@ -102,7 +103,7 @@ var currentProgram;
      rttTexture = gl.createTexture();
      gl.bindTexture(gl.TEXTURE_2D, rttTexture);
      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
      gl.generateMipmap(gl.TEXTURE_2D);
      
      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, rttFramebuffer.width, rttFramebuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -133,12 +134,14 @@ var currentProgram;
 
         
        glowHorizProgram = gl.createProgram();
-       gl.attachShader(glowHorizProgram, vertexShader);
+       gl.attachShader(glowHorizProgram, vertexShader2);
        gl.attachShader(glowHorizProgram, glowHorizShader);
+       gl.linkProgram(glowHorizProgram);
        
        glowVertProgram = gl.createProgram();
-       gl.attachShader(glowVertProgram, vertexShader);
+       gl.attachShader(glowVertProgram, vertexShader2);
        gl.attachShader(glowVertProgram, glowVertShader);
+       gl.linkProgram(glowVertProgram);  
         
        shaderProgram = gl.createProgram();
        gl.attachShader(shaderProgram, vertexShader);
@@ -165,7 +168,7 @@ var currentProgram;
        gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
        shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
-       gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+      // gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
        
        shaderProgram.uColorUniform = gl.getUniformLocation(shaderProgram, "uVertexColor");
        shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
@@ -174,34 +177,39 @@ var currentProgram;
        
        
        shaderProgram2.vertexPositionAttribute = gl.getAttribLocation(shaderProgram2, "aVertexPosition");
-        gl.enableVertexAttribArray(shaderProgram2.vertexPositionAttribute);
+       gl.enableVertexAttribArray(shaderProgram2.vertexPositionAttribute);
 
         shaderProgram2.textureCoordAttribute = gl.getAttribLocation(shaderProgram2, "aTextureCoord");
-        gl.enableVertexAttribArray(shaderProgram2.textureCoordAttribute);
+        //gl.enableVertexAttribArray(shaderProgram2.textureCoordAttribute);
 
         shaderProgram2.uColorUniform = gl.getUniformLocation(shaderProgram2, "uVertexColor");
         shaderProgram2.pMatrixUniform = gl.getUniformLocation(shaderProgram2, "uPMatrix");
         shaderProgram2.mvMatrixUniform = gl.getUniformLocation(shaderProgram2, "uMVMatrix");
         shaderProgram2.samplerUniform = gl.getUniformLocation(shaderProgram2, "uSampler");
-       
-       
       // gl.useProgram(shaderProgram);
        
+      
        
-       /*
-       gl.useProgram(glowHorizProgram);
-       
+       glowHorizProgram.vertexPositionAttribute = gl.getAttribLocation(glowHorizProgram, "aVertexPosition");
+        gl.enableVertexAttribArray(glowHorizProgram.vertexPositionAttribute);
+
+         glowHorizProgram.textureCoordAttribute = gl.getAttribLocation(glowHorizProgram, "aTextureCoord");
+         //gl.enableVertexAttribArray(shaderProgram2.textureCoordAttribute);
        
        glowHorizProgram.uColorUniform = gl.getUniformLocation(glowHorizProgram, "uVertexColor");
        glowHorizProgram.pMatrixUniform = gl.getUniformLocation(glowHorizProgram, "uPMatrix");
        glowHorizProgram.mvMatrixUniform = gl.getUniformLocation(glowHorizProgram, "uMVMatrix");
-       glowHorizProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "glowMap");
+       glowHorizProgram.samplerUniform = gl.getUniformLocation(glowHorizProgram, "uSampler");
        
-       textureShaderProgram.uColorUniform = gl.getUniformLocation(textureShaderProgram, "uVertexColor");
-       textureShaderProgram.pMatrixUniform = gl.getUniformLocation(textureShaderProgram, "uPMatrix");
-       textureShaderProgram.mvMatrixUniform = gl.getUniformLocation(textureShaderProgram, "uMVMatrix");
-       textureShaderProgram.samplerUniform = gl.getUniformLocation(textureShaderProgram, "uSampler");
-*/
+       glowVertProgram.vertexPositionAttribute = gl.getAttribLocation(glowVertProgram, "aVertexPosition");
+         gl.enableVertexAttribArray(glowVertProgram.vertexPositionAttribute);
+
+          glowVertProgram.textureCoordAttribute = gl.getAttribLocation(glowVertProgram, "aTextureCoord");
+
+        glowVertProgram.uColorUniform = gl.getUniformLocation(glowVertProgram, "uVertexColor");
+        glowVertProgram.pMatrixUniform = gl.getUniformLocation(glowVertProgram, "uPMatrix");
+        glowVertProgram.mvMatrixUniform = gl.getUniformLocation(glowVertProgram, "uMVMatrix");
+        glowVertProgram.samplerUniform = gl.getUniformLocation(glowVertProgram, "uSampler");
    }
 
 
@@ -245,10 +253,9 @@ var triangleVertexPositionBuffer;
 var squareVertexPositionBuffer;
 
 
-
 function drawScene() {
   mvPushMatrix();
- // changeShaderProgram(shaderProgram2);
+  changeShaderProgram(shaderProgram);
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -256,47 +263,71 @@ function drawScene() {
 
   mat4.identity(mvMatrix);
 
- // mat4.translate(mvMatrix, [0, -2.0, -22.0]);
- // mat4.rotate(mvMatrix, rotationY, [1, 0, 0]); // Rotate 90 degrees around the Y axis
+  mat4.translate(mvMatrix, [0, -2.0, -22.0]);
+  mat4.rotate(mvMatrix, rotationY, [1, 0, 0]); // Rotate 90 degrees around the Y axis
   
- // mat4.rotate(mvMatrix, rotationX, [0, 1, 0]); // Rotate 90 degrees around the Y axis
+  mat4.rotate(mvMatrix, rotationX, [0, 1, 0]); // Rotate 90 degrees around the Y axis
   
- // mat4.translate(mvMatrix, [-5.0, 0, -5]);
+  mat4.translate(mvMatrix, [-5.0, 0, -5]);
 
-
-  
+  /*
 	gluLookAt(player1.camera.xPos, 4, player1.camera.zPos,
 	          player1.position.x, player1.position.y, player1.position.z,
 	          0, 1, 0 );
-	    
+	    */
   setMatrixUniforms();
-  
- // gl.useProgram(shaderProgr);
+  //..gl.useProgram(shaderProgram2);
   grid.render();
+  
   player1.render();
   player2.render();
   
-  /*
   
   gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
+  gl.viewport(0, 0, rttFramebuffer.width, rttFramebuffer.height);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   
   grid.render();
   player1.render();
   player2.render();
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   
+  //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  changeShaderProgram(glowHorizProgram);
+  gl.enableVertexAttribArray(currentProgram.textureCoordAttribute);
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, rttTexture);
-  gl.uniform1i(shaderProgram2.samplerUniform, 0);
+  gl.uniform1i(currentProgram.samplerUniform, 0);
   
   gl.bindBuffer(gl.ARRAY_BUFFER, basicSquare.vbo);
           gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 
-          gl.bindBuffer(gl.ARRAY_BUFFER, basicSquare.textureVBO);
+          gl.bindBuffer(gl.ARRAY_BUFFER, basicSquare.textureIBO);
           gl.vertexAttribPointer(currentProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+  setMatrixUniforms();
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  gl.disableVertexAttribArray(currentProgram.textureCoordAttribute);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.ONE, gl.ONE);
+  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+  //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  changeShaderProgram(glowVertProgram);
+  gl.enableVertexAttribArray(currentProgram.textureCoordAttribute);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, rttTexture);
+  gl.uniform1i(currentProgram.samplerUniform, 0);
   
-  gl.drawArrays(gl.TRIANGLES, 0, 4);
-  */
+  gl.bindBuffer(gl.ARRAY_BUFFER, basicSquare.vbo);
+          gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+          gl.bindBuffer(gl.ARRAY_BUFFER, basicSquare.textureIBO);
+          gl.vertexAttribPointer(currentProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+  setMatrixUniforms();
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  gl.disableVertexAttribArray(currentProgram.textureCoordAttribute);
+  gl.disable(gl.BLEND);
+  
   mvPopMatrix();
 }
 
@@ -310,6 +341,7 @@ function webGLStart() {
   changeShaderProgram(shaderProgram);
    
 
+  crateGif = TextureUtils.createTexture("crate.gif");
   gl.viewportWidth = canvas.width;
   gl.viewportHeight = canvas.height;
 
@@ -317,9 +349,9 @@ function webGLStart() {
   gl.enable(gl.DEPTH_TEST);
 
   grid = new Grid(20, 20, 1, 1);
-  var startPos = {'x': 2, 'y': 0, 'z': 2};
-  player1 = new Bike(startPos, speed, grid, {x: 1, y: 0.1, z: 1});
-  startPos = {'x': 5, 'y': 0, 'z': 5};
+  var startPos = {'x': 1, 'y': 0, 'z': 1};
+  player1 = new Bike(startPos, speed, grid, {x: 0.9, y: 0.4, z: 0.1});
+  startPos = {'x': 1, 'y': 0, 'z': 15};
   player2 = new Bike(startPos, speed, grid, {x: 0.1, y: 1, z: 1});
   
   (function animloop(){
@@ -382,10 +414,10 @@ function keypress(event) {
 
 function resetGame() {
   grid = new Grid(20, 20, 1, 1);
-  var startPos = {'x': 2, 'y': 0, 'z': 2};
-  player1 = new Bike(startPos, speed, grid, {x: 1, y: 0.1, z: 1});
+  var startPos = {'x': 1, 'y': 0, 'z': 1};
+  player1 = new Bike(startPos, speed, grid, {x: 0.9, y: 0.4, z: 0.1});
   
-  startPos = {'x': 5, 'y': 0, 'z': 5};
+  startPos = {'x': 1, 'y': 0, 'z': 15};
   player2 = new Bike(startPos, speed, grid, {x: 0.1, y: 1, z: 1});
 }
 this.onkeypress = keypress;
