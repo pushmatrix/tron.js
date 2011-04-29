@@ -1,6 +1,8 @@
 var grid;
-var player1;
-var player2;
+var players = [];
+var currentPlayer = 0;
+var otherPlayer = 1;
+var startPositions = [];
 var gl;
 
 var oldX = 0;
@@ -279,8 +281,10 @@ function drawScene() {
   //..gl.useProgram(shaderProgram2);
   grid.render();
   
-  player1.render();
-  player2.render();
+  players[0].render();
+  if (players[1]) {
+    players[1].render();
+  }
   
   
   gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
@@ -288,8 +292,10 @@ function drawScene() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   
   grid.render();
-  player1.render();
-  player2.render();
+  players[0].render();
+  if( players[1]) {
+    players[1].render();
+  }
   
   //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   changeShaderProgram(glowHorizProgram);
@@ -349,16 +355,37 @@ function webGLStart() {
   gl.enable(gl.DEPTH_TEST);
 
   grid = new Grid(20, 20, 1, 1);
-  var startPos = {'x': 1, 'y': 0, 'z': 1};
-  player1 = new Bike(startPos, speed, grid, {x: 0.9, y: 0.4, z: 0.1});
-  startPos = {'x': 1, 'y': 0, 'z': 15};
-  player2 = new Bike(startPos, speed, grid, {x: 0.1, y: 1, z: 1});
+  startPositions[0] = {'x': 1, 'y': 0, 'z': 15};
+  players[0] = new Bike(startPositions[0], speed, grid, {x: 0.9, y: 0.4, z: 0.1});
   
   (function animloop(){
     requestAnimFrame(animloop, gl);
     update();
     drawScene();
     })();
+    
+    
+    now.startGame = function(_startPositions, playerIndex) {
+      console.log("GAME START!");
+      startPositions = _startPositions;
+      currentPlayer = playerIndex;
+      otherPlayer = currentPlayer == 1 ? 0 : 1;
+      resetGame();
+    }
+    
+    now.receiveMsg = function(msg) {
+      console.log(msg);
+      switch(msg) {
+        case 'left':
+          players[otherPlayer].turnLeft();
+          break;
+        case 'right':
+          players[otherPlayer].turnRight();
+          break;
+        default:
+          break;
+      }
+    }
 
 }
 
@@ -397,28 +424,32 @@ this.onmouseup = mouseUp;
 function update() {
   var timestep = (Date.now() - elapsed) * 0.001;
   elapsed = Date.now();
-  player1.update(timestep);
-  player2.update(timestep);
+  players[0].update(timestep);
+  if (players[1]){
+    players[1].update(timestep);
+  }
 }
 
 function keypress(event) {
   var key = String.fromCharCode(event.charCode);
   switch (key) {
-    case "a": player1.turnLeft(); break;
-    case "s": player1.turnRight(); break;
-    case "k": player2.turnLeft(); break;
-    case "l": player2.turnRight(); break;
-    case "r": resetGame();
+    case "a": 
+      players[currentPlayer].turnLeft(); 
+      try { now.sendMsg('left'); } catch(err) {}
+      break;
+    case "s": 
+      players[currentPlayer].turnRight(); 
+      try { now.sendMsg('right'); } catch(err) {}
+      break;
+    case "r": now.resetGame();
   }
 }
 
 function resetGame() {
   grid = new Grid(20, 20, 1, 1);
-  var startPos = {'x': 1, 'y': 0, 'z': 1};
-  player1 = new Bike(startPos, speed, grid, {x: 0.9, y: 0.4, z: 0.1});
+  players[0] = new Bike(startPositions[0], speed, grid, {x: 0.9, y: 0.4, z: 0.1});
   
-  startPos = {'x': 1, 'y': 0, 'z': 15};
-  player2 = new Bike(startPos, speed, grid, {x: 0.1, y: 1, z: 1});
+  players[1] = new Bike(startPositions[1], speed, grid, {x: 0.1, y: 1, z: 1});
 }
 this.onkeypress = keypress;
 
