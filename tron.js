@@ -356,7 +356,7 @@ function webGLStart() {
 
   grid = new Grid(20, 20, 1, 1);
   startPositions[0] = {'x': 1, 'y': 0, 'z': 15};
-  players[0] = new Bike(startPositions[0], speed, grid, {x: 0.9, y: 0.4, z: 0.1});
+  players[0] = new Bike(startPositions[0], speed, grid, {x: 0.9, y: 0.4, z: 0.1}, sendGameState);
   
   (function animloop(){
     requestAnimFrame(animloop, gl);
@@ -375,16 +375,10 @@ function webGLStart() {
     
     now.receiveMsg = function(msg) {
       console.log(msg);
-      switch(msg) {
-        case 'left':
-          players[otherPlayer].turnLeft();
-          break;
-        case 'right':
-          players[otherPlayer].turnRight();
-          break;
-        default:
-          break;
-      }
+      players[otherPlayer].position = msg['position'];
+      players[otherPlayer].direction = msg['direction'];
+      players[otherPlayer].angle = msg['angle'];
+      players[otherPlayer].wall.grow(msg['position'], true);
     }
 
 }
@@ -433,23 +427,29 @@ function update() {
 function keypress(event) {
   var key = String.fromCharCode(event.charCode);
   switch (key) {
-    case "a": 
-      players[currentPlayer].turnLeft(); 
-      try { now.sendMsg('left'); } catch(err) {}
-      break;
-    case "s": 
-      players[currentPlayer].turnRight(); 
-      try { now.sendMsg('right'); } catch(err) {}
-      break;
-    case "r": now.resetGame();
-  }
+      case "a": 
+        players[currentPlayer].turnLeft(); 
+        break;
+      case "s": 
+        players[currentPlayer].turnRight(); 
+        break;
+      case "r": 
+        now.resetGame();
+        break
+    }
+//  players[currentPlayer].
+}
+
+var sendGameState = function() {
+  var msg = { direction: players[currentPlayer].direction, position: players[currentPlayer].position, angle: players[currentPlayer].angle }
+  try { now.sendMsg(msg); } catch(err) {console.log(err)}
 }
 
 function resetGame() {
   grid = new Grid(20, 20, 1, 1);
-  players[0] = new Bike(startPositions[0], speed, grid, {x: 0.9, y: 0.4, z: 0.1});
+  players[currentPlayer] = new Bike(startPositions[currentPlayer], speed, grid, {x: 0.9, y: 0.4, z: 0.1}, sendGameState);
   
-  players[1] = new Bike(startPositions[1], speed, grid, {x: 0.1, y: 1, z: 1});
+  players[otherPlayer] = new Bike(startPositions[otherPlayer], speed, grid, {x: 0.1, y: 1, z: 1});
 }
 this.onkeypress = keypress;
 

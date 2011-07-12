@@ -1,4 +1,4 @@
-var Bike = function(startPos, speed, grid, color) {
+var Bike = function(startPos, speed, grid, color, callback) {
   this.speed = speed;
   this.speedY = 1;
   this.startPos = startPos;
@@ -61,6 +61,7 @@ var Bike = function(startPos, speed, grid, color) {
           this.nextDirection.y = 0;
           this.turnTravel = 0;
           this.wall.grow(this.position, true);
+          callback && callback();
         }
         var cellType = grid.cellType(this.cellPos);
         if (cellType == 1) {
